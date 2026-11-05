@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
+
+    <script type="text/javascript" src="assets/js/exportCSV.js?v=1.04.44"></script>
+    <script type="text/javascript" src="assets/js/importCSV.js?v=1.04.44"></script>
+    <script type="text/javascript" src="assets/jquery/dist/jquery.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    
+    <link rel="stylesheet" href="style/main_style.css?v=1.04.44">
+    <link rel="stylesheet" href="style/loading.css?v=1.04.44">
+    <link rel="stylesheet" href="style/table.css?v=1.04.44">
+    
+    <script type="text/javascript" src="component/js/data_table_car.js?v=1.04.44"></script>
+    <script type="text/javascript" src="component/js/data_table_emp.js?v=1.04.44"></script>
+
+    <link rel="stylesheet" href="assets/boxicons-2.1.4/css/boxicons.min.css"> 
+    <link rel="stylesheet" href="assets/Fonts/fontawesome/css/solid.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="style/side_content.css?v=1.04.44">
+    <script type="text/javascript" src="component/js/sidebox.js?v=1.04.44"></script>
+    <script type="text/javascript" src="component/js/sidebox_conten_car.js?v=1.04.44"></script>
+    <script type="text/javascript" src="component/js/sidebox_conten_emp.js?v=1.04.44"></script>
+
+    <script type="text/javascript" src="component/js/renderTable.js?v=1.04.44"></script>
+
+    <link rel="stylesheet" href="style/alert.notify_conf.css?v=1.04.44">
+    <script type="text/javascript" src="component/js/alert.notify.js?v=1.04.44"></script>
+
+    <script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="component/js/jq-paginator.js?v=1.04.44"></script>
+    <link rel="stylesheet" href="style/paginator.css?v=1.04.44">
+
+    <script type="text/javascript" src="config.js?v=1.04.44"></script>
+    <script type="text/javascript" src="validate.js?v=1.04.44"></script>
+    <script>
+        checkCookie()
+    </script>
+
+    <title>Car Management</title>
+    <link rel="icon" type="image/x-icon" href="assets/icon.png">
+
+</head>
+<body>
+ 
+    <div class="topnav_bar">
+        <div> </div>
+        <div class="menu_link">
+            <div id="menu_1">ข้อมูลพนักงาน</div>
+            <div id="menu_2">การจัดการทะเบียนยานยนต์</div>
+            <i class='bx bx-user-circle' id="user_func"></i>
+        </div>
+        <div class="dropbox_user" id="dropbox_user" style="display: none;">
+            <div style="text-align: center; font-size: 3rem;" class='bx bx-user'></i></div> 
+            <div class="boxmenu">
+                <div class="head_user"># </div>
+                <div id="logout_user">ออกจากระบบ</div>
+            </div>
+        </div>
+        <div class="dropbox_use_arrow" id="dropbox_use_arrow" style="display: none;"> </div>
+    </div>
+
+    <div class="content">
+        
+    </div>
+
+    <script>
+
+        $('.head_user').html(getCookie('UserName'))
+        
+        $('#user_func').on( "click", () => { 
+            $('#dropbox_user').toggle('active')
+            $('#dropbox_use_arrow').toggle('active')
+           
+        })
+
+        $('#logout_user').on( "click", () => { 
+            $('#dropbox_user').toggle('active')
+            $('#dropbox_use_arrow').toggle('active') 
+
+            deleteCookies()
+            
+            location.href = ("Login/")
+
+        })
+
+        /////////////////////////////////////////////////
+
+        const funcEdit_car = (e) => {
+            render_content_edit_car(e.id.split('_')[1] != 'null'? e.id.split('_')[1] : e.id.split('_')[0]);
+            render_sidebox(sidebox_content_car)
+            closeDropbox_car(e.id)
+        }
+
+        const funcDelete_car = (e) => {
+            render_alert('confirm','ลบข้อมูลดังกล่าวออกจากระบบ', remove_car, e.id.split('_')[1] != 'null'? e.id.split('_')[1] : e.id.split('_')[0] )
+            closeDropbox_car(e.id)
+        }
+
+        const funcDelete_emp = (e) => {
+            render_alert('confirm', 'ลบข้อมูลดังกล่าวออกจากระบบ', remove_emp, e.id)
+            closeDropbox_car(e.id)
+        }
+
+        /////////////////////////////////////////////////
+
+        const funcEdit_emp = (e) => {
+
+            render_content_edit_emp(e.id);
+            render_sidebox(sidebox_content_emp)
+            closeDropbox_car(e.id)
+        }
+ 
+        const call_EmpManagement = () => {
+            renderTable_emp()
+            callDataTable_emp('', 1, '')
+            $('#menu_1').addClass('active')
+            $('#menu_2').removeClass('active')
+        }
+
+        const call_CarManagement = () => {
+            renderTable_car()
+            callDataTable_car('', 1, '')
+            $('#menu_1').removeClass('active')
+            $('#menu_2').addClass('active')
+        }
+        
+        $('#menu_1').on( "click", function(e) { 
+            call_EmpManagement()
+           
+        })
+
+        $('#menu_2').on( "click", function(e) { 
+            call_CarManagement()
+            
+        })
+
+        ///////////////////////// first call func render /////////////////////////
+        call_CarManagement() 
+        //////////////////////////////////////////////////////////////////////////
+    
+
+    </script>
+</body>
+</html>

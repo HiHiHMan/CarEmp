@@ -1,0 +1,11 @@
+.loading-csvImport {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    background-color: rgba(43, 43, 43, 0.274);
+    z-index: 999;
+}

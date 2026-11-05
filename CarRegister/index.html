@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="utf-8">
+
+    <script src="../assets/js/color-modes.js"></script>
+
+    <link rel="stylesheet" href="../assets/boxicons-2.1.4/css/boxicons.min.css">
+
+    <script type="text/javascript" src="../assets/jquery/dist/jquery.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style/sandbox.css?v=1.04.44">
+
+    <script type="text/javascript" src="../config.js?v=1.04.44"></script>
+
+    <title>เก็บบันทึกทะเบียนยานยนต์</title>
+    <link rel="icon" type="image/x-icon" href="../assets/icon.png">
+
+    <style>
+        html,body {
+            background: repeating-radial-gradient( circle at 0 0, #ffffff15, #e6e6e618 90px );
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sandbox">
+        <form class="driver_register" id="form-submit" autocomplete="off" method="post">
+            <p class="head_form">เก็บบันทึกทะเบียนยานยนต์</p> 
+            <div class="content_input">
+                
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+        let list = [
+            {
+                name: 'Outsource_Sup',
+                type: 'checkbox',
+                text: 'Outsource, Supplier',
+                min: '',
+                list: '',
+                required : false
+            },
+            {
+                name: 'EmpId',
+                type: 'text',
+                text: 'รหัสพนักงาน (ผู้ขับ)',
+                min: '',
+                list: '',
+                required : true
+            },
+            {
+                name: 'CarRegistration_type',
+                type: 'checkbox',
+                text: '',
+                min: '',
+                list: '',
+                required : true
+            },
+            {
+                name: 'CarRegistration',
+                type: 'text',
+                text: 'ทะเบียน',
+                min: '',
+                list: '',
+                required : false
+            },
+            {
+                name: 'Type',
+                type: 'text',
+                text: 'ประเภทรถ',
+                min: '',
+                list: 'typecar_sh_selt',
+                required : true
+            },
+            {
+                name: 'Brand',
+                type: 'text',
+                text: 'ยี่ห้อ',
+                min: '',
+                list: 'brand_sh_selt',
+                required : true
+            },
+            {
+                name: 'Model',
+                type: 'text',
+                text: 'รุ่น',
+                min: '',
+                list: 'model_sh_selt',
+                required : true
+            },
+            {
+                name: 'Color',
+                type: 'text',
+                text: 'สีรถ',
+                min: '',
+                list: 'color_sh_selt',
+                required : true
+            },
+            {
+                name: 'Energy',
+                type: 'text',
+                text: 'เชื้อเพลิง',
+                min: '',
+                list: 'energy_sh_selt',
+                required : true
+            },
+            {
+                name: 'Location',
+                type: 'text',
+                text: 'สถานที่',
+                min: '',
+                list: 'location_sh_selt',
+                required : true
+            },
+            {
+                name: 'Sticker',
+                type: 'text',
+                text: 'สติกเกอร์',
+                min: '',
+                list: 'sticker_sh_selt',
+                required : true
+            },
+            {
+                name: 'ExpDriLicense_checkbox',
+                type: 'checkbox',
+                text: 'ใบขับขี่ตลอดชีพ',
+                min: '',
+                list: '',
+                required : false
+            },
+            {
+                name: 'ExpDriLicense',
+                type: 'date',
+                text: 'วันหมดอายุใบขับขี่ ( ปี พ.ศ. )',
+                min: '2567-01-01',
+                list: '',
+                required : false
+            },
+            {
+                name: 'ExpAct',
+                type: 'date',
+                text: 'วันหมดอายุ พรบ. ( ปี พ.ศ. )',
+                min: '2567-01-01',
+                list: '',
+                required : false
+            },
+            {
+                name: 'TypeInsurance',
+                type: 'date',
+                text: 'ประเภทประกันภัย',
+                min: '',
+                list: '',
+                required : false
+            },
+            {
+                name: 'ExpInsurance',
+                type: 'date',
+                text: 'วันหมดอายุประกันภัย ( ปี พ.ศ. )',
+                min: '2567-01-01',
+                list: '',
+                required : false
+            }
+        ]        
+
+        
+
+        list.forEach((obj, index) => {
+
+            if(obj.name == 'ExpDriLicense_checkbox') {
+                $('.content_input').append(`<div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="ตลอดชีพ" name="${obj.name}" id="${obj.name}">
+                                                <label class="form-check-label" for="${obj.name}">
+                                                    ${obj.text}
+                                                </label>
+                                            </div>`)
+
+            } else if(obj.name == 'Outsource_Sup') {
+                $('.content_input').append(`<div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="ตลอดชีพ" name="${obj.name}" id="${obj.name}">
+                                                <label class="form-check-label" for="${obj.name}">
+                                                    ${obj.text}
+                                                </label>
+                                            </div>`)
+
+            } else if(obj.name == 'CarRegistration_type') {
+                $('.content_input').append(`
+                                            <div class="d-flex justify-content-start">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="red" name="typeCarRegistration" id="typeCarRegistration">
+                                                    <label class="form-check-label" for="typeCarRegistration">
+                                                        รถป้ายแดง
+                                                    </label>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="ไม่มีทะเบียน" name="noCarRegistration" id="noCarRegistration">
+                                                    <label class="form-check-label" for="noCarRegistration">
+                                                        ไม่มีทะเบียน
+                                                    </label>
+                                                </div>
+
+                                            </div>`)
+ 
+            } else if(obj.name == 'TypeInsurance') {
+                $('.content_input').append(`
+                                            <div class="d-flex justify-content-start">
+                                                &nbsp;&nbsp;ประกันภัย
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" value="ชั้น 1" name="TypeInsurance" id="Insulevel1">
+                                                    <label class="form-check-label" for="Insulevel1">
+                                                        ชั้น 1
+                                                    </label>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" value="ชั้น 2+" name="TypeInsurance" id="Insulevel2p">
+                                                    <label class="form-check-label" for="Insulevel2p">
+                                                        ชั้น 2+
+                                                    </label>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" value="ชั้น 2" name="TypeInsurance" id="Insulevel2">
+                                                    <label class="form-check-label" for="Insulevel2">
+                                                        ชั้น 2
+                                                    </label>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" value="ชั้น 3+" name="TypeInsurance" id="Insulevel3p">
+                                                    <label class="form-check-label" for="Insulevel3p">
+                                                        ชั้น 3+
+                                                    </label>
+                                                </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" value="ชั้น 3" name="TypeInsurance" id="Insulevel3">
+                                                    <label class="form-check-label" for="Insulevel3">
+                                                        ชั้น 3
+                                                    </label>
+                                                </div>
+                                            </div>`)
+ 
+            } else {
+                let box = $("<div>", {
+                    "class": 'form-floating mb-3' 
+                })
+
+                let datalist = $("<datalist>", {
+                    "id": obj.list
+                })
+
+                let input = $("<input>", {
+                    "class": 'form-control',
+                    "type": obj.type,
+                    "id": obj.name,
+                    "name": obj.name,
+                    "placeholder": '',
+                    "list": obj.list,
+                    "min": obj.min,
+                    "required": obj.required
+
+                }).on( "focus", function(ev) { 
+
+                    if(ev.target.id == 'Brand') {
+                        
+                        console.log('brand')
+                        $('#brand_sh_selt').html('') 
+                        getTypeCar($('#Type').val(), '')
+                    
+                    } else if(ev.target.id == 'Model' ) {
+
+                        console.log('model')
+                        $('#model_sh_selt').html('')
+                        getTypeCar($('#Type').val(), $('#Brand').val())
+
+                    }
+                    
+                }).on( "input", function(ev) {
+                    if(ev.target.id == 'CarRegistration') {
+
+                        if($('#CarRegistration').val() == '') {
+                            $('#CarRegistration').css('color','var(--bs-body-color)')
+                            return
+                        }
+                        $.ajax({
+                            url: `${path_api}/api_Car_getCarEmp?CarRegistration=${$('#CarRegistration').val()}`,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(data) {
+                            
+                                if( data.length  > 0 ) {
+                                    $('#CarRegistration').css('color','red') 
+                                    $('#CarRegistrationExists').html('มีข้อมูลเลขทะเบียนนี้อยู่เเล้ว')
+                                    
+                                } else {
+                                    $('#CarRegistration').css('color','var(--bs-body-color)')
+                                    $('#CarRegistrationExists').html('')
+                                }
+                            },
+                            error: function(xhr, status, error) { }
+                        })
+                    } 
+                    
+                }) 
+
+                let label = $("<label>", {
+                    "for": 'floatingInput',
+                    "text": obj.text
+                })
+
+                box.append(datalist)
+                box.append(input)
+                box.append(label)
+
+                $('.content_input').append(box)
+                }
+           
+        })
+
+        $('.content_input').append(`<div class="fe-l"><span id="CarRegistrationExists" style="color:#ff4757;"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-primary">บันทึก</button></div>`)
+
+        // const getCharSeq = (val) => {
+        //     let seqAZ = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'.toUpperCase()
+        //     seqAZ = seqAZ.split(',')
+        //     let index = seqAZ.findIndex((char) => char.toUpperCase() == val.toUpperCase())
+        //     return  index + 1 < (seqAZ.length-1) ? {pre: seqAZ[index], next: seqAZ[index+1]} : {pre: seqAZ[index], next: '?'}
+        // }
+
+        $('#form-submit').on('submit', (event) => {
+
+            event.preventDefault()
+            const data = new FormData(event.currentTarget)
+
+            let current_date = new Date()
+            current_date = current_date.setFullYear(current_date.getFullYear() + 543)
+
+            let jData = []
+
+            // for (var pair of data.entries()) {
+            //     console.log(pair[0] + ' , ' + pair[1])
+            // }
+
+            let char = data.get('Outsource_Sup')? 
+                            'O'
+                          :
+                            data.get('Location').split(' ')[0].toUpperCase() == 'DC'?
+                                    'D'
+                                :
+                                    'C'
+ 
+            let date = new Date(current_date)
+            let year = date.getFullYear();
+            let month = ('0' + (date.getMonth() + 1)).slice(-2);
+            let day = ('0' + date.getDate()).slice(-2);
+            let hours = ('0' + date.getHours()).slice(-2);
+            let minutes = ('0' + date.getMinutes()).slice(-2);
+            let seconds = ('0' + date.getSeconds()).slice(-2);
+            let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+            jData = {
+                        "typeNo":  char, 
+                        "callFunc":  'AddVehicle', 
+
+                        "DataUpDate": formattedDate, 
+                        "EmpId": data.get('EmpId'),
+                        "CarRegistration": data.get('noCarRegistration')? data.get('noCarRegistration') : data.get('CarRegistration'),
+                        "typeCarRegistration": data.get('typeCarRegistration'),
+                        "Brand": data.get('Brand'),
+                        "Model": data.get('Model'),
+                        "Color": data.get('Color'),
+                        "Type": data.get('Type'),
+                        "Energy": data.get('Energy'),
+                        "ExpDriLicense": data.get('ExpDriLicense_checkbox')? '9999-09-09' : data.get('ExpDriLicense'),
+                        "ExpAct": data.get('ExpAct'),
+                        "ExpInsurance": data.get('ExpInsurance'),
+                        "TypeInsurance": data.get('TypeInsurance'),
+                        "Sticker": data.get('Sticker'),
+                        "Location": data.get('Location')
+                    }
+
+     
+            $.ajax({
+
+                url: path_api + '/api_Car_MVehicle?typeNo=' + char,
+                type: 'POST', 
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: jData,
+                success: function(response) { 
+       
+                    if(response.msg[0][''] =='EXISTS') {
+                        $('.sandbox').html(
+                            '<div class="box_alert">\
+                                <div class="alert_fail">\
+                                    <i class="bx bx-x-circle"></i>\
+                                </div>\
+                                <p>Duplicate !!</p>\
+                                <span>ข้อมูลไม่ถูกบันทึก มีข้อมูลทะเบียนนี้อยู่แล้ว</span>\
+                            </div>'
+                        )
+                    } else { 
+                        $('.sandbox').html(
+                            '<div class="box_alert">\
+                                <div class="alert_success">\
+                                    <i class="bx bx-check"></i>\
+                                </div>\
+                                <p>Success !</p>\
+                                <span>ข้อมูลถูกบันทึกเรียบร้อย</span>\
+                            </div>'
+                        )
+                    }
+                    
+
+                },
+                error: function(xhr, status, error) {
+                    console.log(error)
+                }
+
+            }); 
+                  
+   
+        })
+
+        const getTypeCar = (type, brand) => {
+            $.ajax({
+                url: path_api + '/api_Car_getBrandCar?type_car=' + type,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+
+                    $('#brand_sh_selt').html('')
+                    data.map((item, index) => (
+                        $('#brand_sh_selt').append(
+                            $("<option>", {
+                                "key": index,
+                                "value": item.brand
+
+                            })
+                        )
+
+                    ))
+
+                }
+            })
+
+            $.ajax({
+                url: path_api + '/api_Car_getModelCar?type_car=' + type + '&brand=' + brand,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+
+                    $('#model_sh_selt').html('')
+                    data.map((item, index) => (
+                        $('#model_sh_selt').append(
+                            $("<option>", {
+                                "key": index,
+                                "value": item.model
+
+                            })
+                        )
+
+                    ))
+
+                }
+            })
+
+
+            $.ajax({
+                url: path_api + '/api_Car_getColorCar',
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+
+                    $('#color_sh_selt').html('')
+                    data.map((item, index) => (
+                        $('#color_sh_selt').append(
+                            $("<option>", {
+                                "key": index,
+                                "value": item.color
+
+                            })
+                        )
+
+                    ))
+
+                }
+            })
+
+            $.ajax({
+                url: path_api + '/api_Car_getTypeCar',
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+
+                    $('#typecar_sh_selt').html('')
+                    data.map((item, index) => (
+                        $('#typecar_sh_selt').append(
+                            $("<option>", {
+                                "key": index,
+                                "value": item.type_car
+
+                            })
+                        )
+
+                    ))
+
+                    //////////////////////////////////////////////////////////////////////
+
+                    let data_energy = [
+                        {
+                            energy: 'LPG/NGV'
+                        },
+                        {
+                            energy: 'ไฟฟ้า'
+                        },
+                        {
+                            energy: 'น้ำมัน'
+                        }
+                    ]
+
+                    $('#energy_sh_selt').html('')
+                    data_energy.map((item, index) => (
+                        $('#energy_sh_selt').append(
+                            '<option key=' + index + ' value="' + item.energy + '">'
+                        )
+
+                    ))
+
+                    //////////////////////////////////////////////////////////////////////
+
+                    let data_location = [
+                        {
+                            location: 'CDC มหาชัย'
+                        },
+                        {
+                            location: 'BDC มหาชัย'
+                        },
+                        {
+                            location: 'DC มหาชัย'
+                        }
+                    ]
+
+                    $('#location_sh_selt').html('')
+                    data_location.map((item, index) => (
+                        $('#location_sh_selt').append(
+                            '<option key=' + index + ' value="' + item.location + '">'
+                        )
+
+                    ))
+
+                    //////////////////////////////////////////////////////////////////////
+
+                    let data_sticker = [
+                        {
+                            sticker: 'ชั่วคราว'
+                        },
+                        {
+                            sticker: 'ถาวร'
+                        }
+                    ]
+
+                    $('#sticker_sh_selt').html('')
+                    data_sticker.map((item, index) => (
+                        $('#sticker_sh_selt').append(
+                            '<option key=' + index + ' value="' + item.sticker + '">'
+                        )
+
+                    ))
+
+
+                }
+            })
+
+        }
+
+        getTypeCar('', '')
+
+    </script>
+</body>
+
+</html>

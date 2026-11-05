@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="utf-8">
+
+    <script src="../assets/js/color-modes.js"></script>
+
+    <link rel="stylesheet" href="../assets/boxicons-2.1.4/css/boxicons.min.css">
+
+    <script type="text/javascript" src="../assets/jquery/dist/jquery.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style/sandbox.css?v=1.04.44">
+
+    <script type="text/javascript" src="../config.js?v=1.04.44"></script>
+
+    <title>เก็บบันทึกข้อมูลผู้ขับ</title>
+    <link rel="icon" type="image/x-icon" href="../assets/icon.png">
+
+    <style>
+        html,body {
+            background: repeating-radial-gradient( circle at 0 0, #ffffff15, #e6e6e618 90px );
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sandbox">
+        <form class="driver_register" id="form-submit" autocomplete="off" method="post">
+            <p class="head_form">เก็บบันทึกข้อมูลผู้ขับ (Outsource and Sup)</p>
+            <div class="content_input">
+            <!-- <div class="form-floating mb-3 ">
+                    <input type="text " class="form-control" id="emp_id" name="emp_id" placeholder="" required>
+                    <label for="floatingInput">รหัสพนักงาน</label>
+                </div> -->
+                <div class="mb-3">
+
+                    <div class="my-3 box_group">
+                        <label>เพศ</label>
+
+                        <div class="form-check">
+                            <input id="gender" name="gender" type="radio" class="form-check-input" value="ชาย" checked="" required>
+                            <label class="form-check-label" for="credit">ชาย</label>
+                        </div>
+                        <div class="form-check">
+                            <input id="gender" name="gender" type="radio" class="form-check-input" value="หญิง" required>
+                            <label class="form-check-label" for="debit">หญิง</label>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="fullName" name="fullName" placeholder="" required>
+                    <label for="floatingInput">ชื่อ - สกุล *</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="fullNameEng" name="fullNameEng" placeholder=""  >
+                    <label for="floatingInput">ชื่อ-สกุล (Eng)</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <datalist id="dept_sh_selt"></datalist>
+                    <input type="text" class="form-control" id="dept" name="dept" placeholder="" list="dept_sh_selt" required>
+                    <label for="floatingInput">หน่วยงาน *</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <datalist id="position_sh_selt"></datalist>
+                    <input type="text" class="form-control" id="position" name="position" placeholder="" list="position_sh_selt">
+                    <label for="floatingInput">ตำแหน่ง</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <datalist id="location_sh_selt">
+                        <option key="0" value="CDC มหาชัย"></option>
+                        <option key="1" value="BDC มหาชัย"></option>
+                        <option key="2" value="DC มหาชัย"></option>
+                    </datalist>
+                    <input type="text" class="form-control" id="office" name="office" placeholder="" list="location_sh_selt">
+                    <label for="floatingInput">สถานที่ทำงาน</label>
+                </div>
+                <!-- <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="workdate" name="workdate" placeholder=""  min="2567-01-01" required>
+                    <label for="floatingInput">วันเริ่มงาน ( ปี พ.ศ. )</label>
+                </div> -->
+                <div class="fe-l"><button type="submit" class="btn btn-primary">บันทึก</button></div>
+                <!-- <div class="box_input">
+                    <datalist id="typecar_sh_selt">
+                        <option key="0" value="รถจักรยานยนต์"></option>
+                        <option key="1" value="รถยนต์"></option>
+                    </datalist>
+                    <p class="label_filed">ประเภทรถ</p><input class="border_sty" id="type" name="type"
+                        list="typecar_sh_selt">
+                </div> -->
+
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+        $('#form-submit').on('submit', (event) => {
+
+            event.preventDefault()
+            const data = new FormData(event.currentTarget)
+
+            for (var pair of data.entries()) {
+                console.log(pair[0] + ' , ' + pair[1])
+            }
+
+            let jData = {
+                "callFunc": 'AddOS', 
+                "EmpNameTitle": '',
+                "EmpName": data.get('fullName'),
+                "EmpEngName": data.get('fullNameEng'),
+                "EmpGender": data.get('gender'),
+                "EmpPosition": data.get('position'),
+                "EmpDept": data.get('dept'),
+                "EmpWorkDate": '',
+                "EmpOffice": data.get('office')
+            }
+ 
+            $.ajax({
+            
+                url: path_api + '/api_Car_MEmp' ,
+                type: 'POST',
+                // contentType: "application/json",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: jData,
+                success: function(response) { 
+                    $('.sandbox').html(
+                        '<div class="box_alert">\
+                            <div class="alert_success">\
+                                <i class="bx bx-check"></i>\
+                            </div>\
+                            <p>Success !</p>\
+                            <span>ข้อมูลถูกบันทึกเรียบร้อย</span>\
+                        </div>'
+                    )
+
+                },
+                error: function(xhr, status, error) {
+                    console.log(error)
+                }
+
+            });
+
+        })
+
+        const getTypeEmp = () => {
+            $.ajax({
+                url: path_api + '/api_Car_getDept',
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+
+                    $('#dept_sh_selt').html('')
+                    data.map((item, index) => (
+                        $('#dept_sh_selt').append(
+                            $("<option>", {
+                                "key": index,
+                                "value": item.EmpDept
+
+                            })
+                        )
+
+                    ))
+
+                }
+            })
+
+            $.ajax({
+                url: path_api + '/api_Car_getPosition',
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+
+                    $('#position_sh_selt').html('')
+                    data.map((item, index) => (
+                        $('#position_sh_selt').append(
+                            $("<option>", {
+                                "key": index,
+                                "value": item.EmpPosition
+
+                            })
+                        )
+
+                    ))
+
+                }
+            })
+        }
+
+        getTypeEmp()        
+
+    </script>
+</body>
+
+</html>
