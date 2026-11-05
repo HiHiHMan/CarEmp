@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>นำเข้าข้อมูล | Car Management</title>
+    <link rel="icon" type="image/x-icon" href="../assets/icon.png">
+    <link rel="stylesheet" href="../assets/boxicons-2.1.4/css/boxicons.min.css">
+    <link rel="stylesheet" href="../style/main_style.css?v=1.04.44">
+    <link rel="stylesheet" href="../style/alert.notify_conf.css?v=1.04.44">
+    <style>
+        body { min-height: 100vh; background: #f5f7fb; }
+        .import-page { width: min(900px, calc(100% - 32px)); margin: 42px auto; }
+        .page-heading { margin-bottom: 24px; }
+        .page-heading h1 { font-size: 1.65rem; font-weight: 600; color: #263445; }
+        .page-heading p { margin-top: 5px; color: #788596; font-size: .95rem; }
+        .import-card { background: #fff; border: 1px solid #e8edf3; border-radius: 14px; padding: 26px; box-shadow: 0 8px 28px rgba(31, 48, 70, .06); }
+        .section-label { display: block; margin-bottom: 10px; font-size: 1rem; font-weight: 500; color: #344256; }
+        .type-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .type-option { display: flex; align-items: center; gap: 12px; padding: 15px; border: 1px solid #dce4ed; border-radius: 10px; cursor: pointer; transition: .18s ease; }
+        .type-option:has(input:checked) { border-color: #2785d8; background: #f0f7ff; box-shadow: 0 0 0 2px rgba(39,133,216,.08); }
+        .type-option input { accent-color: #2785d8; width: 16px; height: 16px; }
+        .type-option i { font-size: 25px; color: #3988ca; }
+        .type-option strong { display: block; font-size: .95rem; font-weight: 500; color: #344256; }
+        .type-option small { display: block; margin-top: 2px; color: #8793a2; font-size: .78rem; }
+        .drop-zone { min-height: 210px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; border: 2px dashed #cbd7e4; border-radius: 12px; background: #fafcff; text-align: center; cursor: pointer; transition: .2s ease; }
+        .drop-zone.dragover { border-color: #2785d8; background: #f0f7ff; }
+        .drop-zone > i { font-size: 46px; color: #6c9fce; }
+        .drop-zone strong { margin-top: 8px; color: #344256; font-size: 1rem; font-weight: 500; }
+        .drop-zone span { margin-top: 4px; color: #8995a4; font-size: .82rem; }
+        .file-input { display: none; }
+        .file-info { display: none; width: 100%; max-width: 520px; margin-top: 16px; padding: 10px 13px; border-radius: 8px; background: #edf5fc; text-align: left; }
+        .file-info strong { display: block; overflow-wrap: anywhere; color: #315c80; }
+        .file-info small { color: #71869a; }
+        .preview { display: none; margin-top: 22px; }
+        .preview-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .preview-head strong { color: #344256; font-size: .95rem; font-weight: 500; }
+        .preview-head span { color: #8491a0; font-size: .8rem; }
+        .table-wrap { overflow: auto; max-height: 260px; border: 1px solid #e6ebf1; border-radius: 8px; }
+        .preview table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        .preview th, .preview td { padding: 8px 11px; border-bottom: 1px solid #edf0f4; text-align: left; font-size: .78rem; }
+        .preview th { position: sticky; top: 0; background: #f4f7fa; color: #506176; font-weight: 500; }
+        .preview td { color: #637184; }
+        .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+        .btn { min-width: 112px; padding: 9px 18px; border: 0; border-radius: 8px; cursor: pointer; font: inherit; }
+        .btn-cancel { background: #edf1f5; color: #586779; }
+        .btn-upload { background: #2785d8; color: #fff; }
+        .btn-upload:disabled { opacity: .45; cursor: not-allowed; }
+        .note { margin-top: 16px; color: #8a96a4; font-size: .78rem; line-height: 1.7; }
+        @media (max-width: 600px) {
+            .import-page { margin: 24px auto; }
+            .import-card { padding: 18px; }
+            .type-options { grid-template-columns: 1fr; }
+            .actions { flex-direction: column-reverse; }
+            .btn { width: 100%; }
+        }
+    </style>
+    <script src="../assets/jquery/dist/jquery.min.js"></script>
+    <script src="../config.js?v=1.04.44"></script>
+    <script src="../validate.js?v=1.04.44"></script>
+    <script src="../component/js/alert.notify.js?v=1.04.44"></script>
+    <script src="../assets/js/importCSV.js?v=1.04.44"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="topnav_bar">
+        <div style="padding-left:14px;color:#fff;font-size:1rem;">Car Management</div>
+        <div class="menu_link">
+            <div onclick="location.href='../'">กลับหน้าหลัก</div>
+        </div>
+    </div>
+
+    <main class="import-page">
+        <header class="page-heading">
+            <h1><i class="bx bx-import" style="color:#2785d8;"></i> นำเข้าข้อมูล</h1>
+            <p>เลือกประเภทข้อมูล จากนั้นเลือกไฟล์ Excel หรือ CSV ที่ต้องการนำเข้าสู่ระบบ</p>
+        </header>
+
+        <section class="import-card">
+            <label class="section-label">1. เลือกประเภทข้อมูล</label>
+            <div class="type-options">
+                <label class="type-option">
+                    <input type="radio" name="importType" value="dataset_emp" checked>
+                    <i class="bx bx-user"></i>
+                    <span><strong>ข้อมูลพนักงาน</strong><small>นำเข้ารายชื่อและข้อมูลพนักงาน</small></span>
+                </label>
+                <label class="type-option">
+                    <input type="radio" name="importType" value="dataset_car">
+                    <i class="bx bx-car"></i>
+                    <span><strong>ข้อมูลทะเบียนยานยนต์</strong><small>นำเข้าข้อมูลรถและทะเบียนรถ</small></span>
+                </label>
+            </div>
+
+            <label class="section-label">2. เลือกไฟล์ที่ต้องการนำเข้า</label>
+            <input class="file-input" id="importFile" type="file" accept=".xlsx,.csv">
+            <label class="drop-zone" id="dropZone" for="importFile">
+                <i class="bx bx-cloud-upload"></i>
+                <strong>คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</strong>
+                <span>รองรับไฟล์ .xlsx และ .csv</span>
+                <div class="file-info" id="fileInfo">
+                    <strong id="fileName"></strong>
+                    <small id="fileSize"></small>
+                </div>
+            </label>
+
+            <div class="preview" id="preview">
+                <div class="preview-head">
+                    <strong>ตัวอย่างข้อมูลในไฟล์</strong>
+                    <span id="rowCount"></span>
+                </div>
+                <div class="table-wrap">
+                    <table id="previewTable"></table>
+                </div>
+            </div>
+
+            <p class="note">หมายเหตุ: กรุณาตรวจสอบประเภทข้อมูลและไฟล์ก่อนนำเข้า ระบบจะส่งไฟล์ไปประมวลผลตามขั้นตอนนำเข้าที่มีอยู่ใน Car Management</p>
+            <div class="actions">
+                <button class="btn btn-cancel" type="button" id="clearBtn">ยกเลิก</button>
+                <button class="btn btn-upload" type="button" id="uploadBtn" disabled><i class="bx bx-upload"></i> นำเข้าข้อมูล</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const fileInput = document.getElementById('importFile');
+        const dropZone = document.getElementById('dropZone');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+        let selectedFile = null;
+
+        const formatSize = (bytes) => {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        };
+
+        const clearFile = () => {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('previewTable').innerHTML = '';
+            uploadBtn.disabled = true;
+        };
+
+        const showPreview = (file) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const workbook = XLSX.read(event.target.result, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                    if (!rows.length) throw new Error('empty');
+
+                    const table = document.getElementById('previewTable');
+                    table.innerHTML = '';
+                    const header = document.createElement('tr');
+                    (rows[0] || []).forEach(value => {
+                        const th = document.createElement('th');
+                        th.textContent = value;
+                        header.appendChild(th);
+                    });
+                    const thead = document.createElement('thead');
+                    thead.appendChild(header);
+                    table.appendChild(thead);
+
+                    const tbody = document.createElement('tbody');
+                    rows.slice(1, 11).forEach(row => {
+                        const tr = document.createElement('tr');
+                        (rows[0] || []).forEach((_, index) => {
+                            const td = document.createElement('td');
+                            td.textContent = row[index] ?? '';
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    document.getElementById('rowCount').textContent = (rows.length - 1).toLocaleString() + ' รายการ';
+                    document.getElementById('preview').style.display = 'block';
+                } catch (error) {
+                    clearFile();
+                    alert('ไม่สามารถอ่านข้อมูลในไฟล์ได้ กรุณาตรวจสอบไฟล์อีกครั้ง');
+                }
+            };
+            reader.onerror = () => {
+                clearFile();
+                alert('เกิดข้อผิดพลาดในการอ่านไฟล์');
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        const acceptFile = (file) => {
+            if (!file) return;
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (!['xlsx', 'csv'].includes(extension)) {
+                alert('รองรับเฉพาะไฟล์ .xlsx และ .csv');
+                clearFile();
+                return;
+            }
+            if (file.size > 20 * 1024 * 1024) {
+                alert('ขนาดไฟล์ต้องไม่เกิน 20 MB');
+                clearFile();
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatSize(file.size);
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+            showPreview(file);
+        };
+
+        fileInput.addEventListener('change', (event) => acceptFile(event.target.files[0]));
+        ['dragenter', 'dragover'].forEach(name => dropZone.addEventListener(name, event => {
+            event.preventDefault();
+            dropZone.classList.add('dragover');
+        }));
+        ['dragleave', 'drop'].forEach(name => dropZone.addEventListener(name, event => {
+            event.preventDefault();
+            dropZone.classList.remove('dragover');
+        }));
+        dropZone.addEventListener('drop', event => acceptFile(event.dataTransfer.files[0]));
+
+        document.getElementById('clearBtn').addEventListener('click', clearFile);
+        uploadBtn.addEventListener('click', () => {
+            if (!selectedFile) return;
+            const importType = document.querySelector('input[name="importType"]:checked').value;
+            if (!confirm('ยืนยันนำเข้าไฟล์ ' + selectedFile.name + ' หรือไม่?')) return;
+            uploadBtn.disabled = true;
+            try {
+                saveFileDir(selectedFile, importType);
+            } catch (error) {
+                uploadBtn.disabled = false;
+                alert('ไม่สามารถเริ่มการนำเข้าข้อมูลได้');
+                console.error(error);
+            }
+        });
+
+        if (typeof checkCookie === 'function') checkCookie();
+    </script>
+</body>
+</html>
